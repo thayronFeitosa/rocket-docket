@@ -1,6 +1,7 @@
 import { container } from 'tsyringe';
 import { io } from '../http'
 import { CreateChatRoomService } from '../services/CreateChatRoomService';
+import { CreateMessageService } from '../services/CreateMessageService';
 import { CreateUserService } from '../services/CreateUserService';
 import { GetAllUsersService } from '../services/GetAllUsersService';
 import { GetChatRoomByUsersService } from '../services/GetChatRoomByUsersService';
@@ -36,6 +37,28 @@ io.on('connect', (socket) => {
         if (!room) {
             room = await createChatRoomService.execute([data.idUser, userLogged._id]);
         }
+        socket.join(room.idChatRoom)
         callback(room)
+    });
+
+    socket.on('message', async (data) => {
+        const getUserBySockerIdService = container.resolve(GetUserBySockerIdService);
+        const createMessageService = container.resolve(CreateMessageService);
+        const user = await getUserBySockerIdService.execute(socket.id);
+
+        const message = await createMessageService.execute({
+            to: user._id,
+            roomId: data.idChatRoom,
+            text: data.message
+        });
+
+        io.to(data.idChatRoom).emit("message", {
+            message,
+            user
+        })
+
+        // Buscar as infoemações do usuário docker.io
+        // Salvar as mensagens
+        // Enviar a mensagem para outros usuários da sala
     })
 });
