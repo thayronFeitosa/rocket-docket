@@ -4,7 +4,7 @@ import { User } from "../schemas/User"
 interface CreateUserDTO {
     email: string;
     socket_id: string
-    avatar: string
+    avatar_url: string
     name: string
 }
 
@@ -12,7 +12,7 @@ interface CreateUserDTO {
 @injectable()
 class CreateUserService {
 
-    async execute({ email, socket_id, avatar, name }: CreateUserDTO) {
+    async execute({ email, socket_id, avatar_url, name }: CreateUserDTO) {
         const userAlreadyExists = await User.findOne({ email }).exec();
         if (userAlreadyExists) {
             const user = await User.findOneAndUpdate(
@@ -20,7 +20,7 @@ class CreateUserService {
                     _id: userAlreadyExists._id
                 },
                 {
-                    $set: { socket_id, avatar, name }
+                    $set: { socket_id, avatar_url, name }
                 },
                 {
                     new: true
@@ -31,7 +31,7 @@ class CreateUserService {
             const user = await User.create({
                 email,
                 socket_id,
-                avatar,
+                avatar_url,
                 name,
             });
             return user;

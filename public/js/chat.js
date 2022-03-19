@@ -7,7 +7,48 @@ function onLoad() {
   const avatar = urlParams.get("avatar");
   const email = urlParams.get("email");
 
-  console.log(name, avatar, email);
+  document.querySelector(".user_logged").innerHTML += `
+  <img
+    class="avatar_user_logged"
+    src=${avatar}
+  />
+  <strong id="user_logged">${name}</strong>
+
+`;
+
+socket.on("new_users", (user) => {
+  const existInDiv = document.getElementById(`user_${user._id}`);
+  if (!existInDiv) {
+    addUser(user);
+  }
+});
+
+socket.emit("get_users", (users) => {
+  users.map((user) => {
+    if (user.email !== email) {
+      addUser(user);
+    }
+  });
+});
+
+function addUser(user) {
+  console.log(user);
+  const usersList = document.getElementById("users_list");
+  usersList.innerHTML += ` 
+    <li
+      class="user_name_list"
+      id="user_${user._id}"
+      idUser="${user._id}"
+      >
+        <img
+          class="nav_avatar"
+          src=${user.avatar_url}
+        />
+        ${user.name}
+    </li>
+  `;
+}
+
 
   socket.emit("start", {
     email,
