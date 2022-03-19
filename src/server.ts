@@ -1,4 +1,4 @@
 
 import { server } from "./http";
 import './websocket/ChatService'
-server.listen(3000, () => console.log('Serviador rodando na porta 3333'));
+server.listen(process.env.PORT, () => console.log(`Serviador rodando na porta ${process.env.PORT}`));

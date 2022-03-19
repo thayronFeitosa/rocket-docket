@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  mongo_service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    tty: true
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME?Please set MONGO_INITDB_ROOT_USERNAME in .env file}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD?Please set MONGO_INITDB_ROOT_PASSWORD in .env file}
+    volumes:
+      - .docker/data/mongo/:/data/db
+    networks:
+      application_internal_network:
+        ipv4_address: '${DOCKER_DB_SERVER_IPV4}'
+
+networks:
+  application_internal_network:
+    name: '${DOCKER_NETWORK_NAME}'
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: '${DOCKER_NETWORK_SUBNET}'

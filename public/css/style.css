@@ -112,4 +112,11 @@
   display: none;
 }
 
+.chat_message_user {
+  width: 100%;
+  height: 80px;
+
+  color: red;
+}
+
 
