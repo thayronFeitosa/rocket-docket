@@ -10,9 +10,6 @@ const app = express();
 
 const server = createServer(app);
 
-
-app.use(express.static(path.join(__dirname, '..', 'public')));
-
 mongoose.connect(`mongodb://${process.env.DOCKER_DB_SERVER_IPV4}:27017/teste`, {
     authSource: "admin",
     user: process.env.MONGO_INITDB_ROOT_USERNAME,
@@ -20,6 +17,8 @@ mongoose.connect(`mongodb://${process.env.DOCKER_DB_SERVER_IPV4}:27017/teste`, {
 }).then(() => {
     console.log('MongoDB connected...')
 }).catch((e) => { console.log('error:', e) });
+
+app.use(express.static(path.join(__dirname, '..', 'public')));
 
 const io = new Server(server);
 
