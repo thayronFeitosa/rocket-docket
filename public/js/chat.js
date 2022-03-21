@@ -38,8 +38,25 @@ function onLoad() {
   });
 
   socket.on("message", (data) => {
-    console.log(data);
+    addMessage(data);
   })
+
+  function addMessage(data) {
+    const divMessageUser = document.getElementById('message_user');
+    divMessageUser.innerHTML += `
+    <span class="user_name user_name_date">
+      <img
+        class="img_user"
+        src=${data.user.avatar_url}
+      />
+      <strong>${data.user.name}</strong>
+      <span> ${dayjs(data.message.created_at).format('DD/MM/YYYY HH:mm')}</span>
+      </span>
+      
+    <div class="messages">
+      <span class="chat_message"> ${data.message.text}</span>
+    </div>`
+  }
 
   function addUser(user) {
     const usersList = document.getElementById("users_list");
@@ -58,12 +75,18 @@ function onLoad() {
   `;
   }
   document.getElementById('users_list').addEventListener('click', (event) => {
+    document.getElementById('message_user').innerHTML = "";
     if (event.target && event.target.matches('li.user_name_list')) {
       const idUser = event.target.getAttribute('idUser');
-      console.log(idUser);
-
-      socket.emit('start_chat', { idUser }, (data) => {
-        idChatRoom = data.idChatRoom
+      socket.emit('start_chat', { idUser }, (response) => {
+        idChatRoom = response.room.idChatRoom,
+          response.messages.forEach((message) => {
+            const data = {
+              message,
+              user: message.to
+            };
+            addMessage(data)
+          })
       })
     }
   });
@@ -77,7 +100,6 @@ function onLoad() {
         message,
         idChatRoom
       }
-
       socket.emit("message", data);
     }
 
